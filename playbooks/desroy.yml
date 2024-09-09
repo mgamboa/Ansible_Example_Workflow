@@ -1,0 +1,30 @@
+---
+- name: Destroy VMware Deployment
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - ../group_vars/all.yml
+  tasks:
+    - name: Remove VMs
+      community.vmware.vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        name: "{{ item.name }}"
+        state: absent
+        force: yes
+      loop: "{{ vm_specs }}"
+      ignore_errors: yes
+
+    - name: Remove VMs from known_hosts file
+      known_hosts:
+        name: "{{ item.name }}"
+        state: absent
+      loop: "{{ vm_specs }}"
+      ignore_errors: yes
+
+    - name: Display destruction completion message
+      debug:
+        msg: "All VMs have been destroyed and removed from the inventory."

@@ -5,22 +5,25 @@
   gather_facts: false
   vars_files:
     - ../group_vars/all.yml
-  tasks:
-    - name: Include VM provisioning tasks
-      include_tasks: tasks/provision_vms.yml
+ tasks:
+    - name: Run deployment tasks
+      block:
+        - name: Include VM provisioning tasks
+          include_tasks: tasks/provision_vms.yml
 
-    - name: Include HAProxy configuration tasks
-      include_tasks: tasks/configure_haproxy.yml
+        - name: Include HAProxy configuration tasks
+          include_tasks: tasks/configure_haproxy.yml
 
-    - name: Include Web Server configuration tasks
-      include_tasks: tasks/configure_webservers.yml
+        - name: Include Web Server configuration tasks
+          include_tasks: tasks/configure_webservers.yml
 
-    - name: Include Database configuration tasks
-      include_tasks: tasks/configure_database.yml
+        - name: Include Database configuration tasks
+          include_tasks: tasks/configure_database.yml
 
-    - name: Display server information
-      include_tasks: tasks/display_info.yml
-    
-    - name: Destroy Deployment 
+        - name: Display server information
+          include_tasks: tasks/display_info.yml
+      when: not (destroy_deployment | default(false) | bool)
+
+    - name: Destroy Deployment
       include_tasks: tasks/destroy.yml
       when: destroy_deployment | default(false) | bool

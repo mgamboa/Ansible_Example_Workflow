@@ -20,3 +20,6 @@
 
     - name: Display server information
       include_tasks: tasks/display_info.yml
+    
+    - name: Destroy Deployment 
+      include_tasks: tasks/destroy.yml

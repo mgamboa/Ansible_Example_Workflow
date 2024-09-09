@@ -1,0 +1,36 @@
+---
+- name: Configure Web Servers
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: Install Apache and PHP
+      yum:
+        name: 
+          - httpd
+          - php
+          - php-mysqlnd
+        state: present
+
+    - name: Start and enable Apache
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Create welcome page
+      template:
+        src: templates/welcome.php.j2
+        dest: /var/www/html/index.php
+      notify: Restart Apache
+
+    - name: Create database connection test script
+      template:
+        src: templates/db_test.php.j2
+        dest: /var/www/html/db_test.php
+      notify: Restart Apache
+
+  handlers:
+    - name: Restart Apache
+      systemd:
+        name: httpd
+        state: restarted

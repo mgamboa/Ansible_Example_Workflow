@@ -1,0 +1,26 @@
+<?php
+$host = '{{ hostvars[groups['database'][0]]['ansible_host'] }}';
+$db   = '{{ mysql_database }}';
+$user = '{{ mysql_user }}';
+$pass = '{{ mysql_password }}';
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+
+try {
+    $pdo = new PDO($dsn, $user, $pass, $options);
+    echo "<h2>Successfully connected to the database.</h2>";
+
+    $stmt = $pdo->query("SELECT * FROM messages");
+    while ($row = $stmt->fetch()) {
+        echo "Message: " . htmlspecialchars($row['message']) . "<br>";
+    }
+} catch (\PDOException $e) {
+    throw new \PDOException($e->getMessage(), (int)$e->getCode());
+}
+?>

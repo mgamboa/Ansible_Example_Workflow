@@ -1,0 +1,23 @@
+---
+vcenter_username: "Administrator@itmco.local"
+vcenter_password: ""  # Set this securely in AWX
+vcenter_hostname: "vcenter.itmco.local"
+template_name: "RL9"
+cluster_name: "ITMCO"
+datacenter_name: "Datacenter"
+domain_name: "itmco.local"
+vm_network_name: "DSwitch-VM Network"
+vm_folder: "/vm/AAP_HOSTS"
+datastore_name: "datastore1"  # Adjust this to your VMware datastore name
+
+vm_specs:
+  - { name: "haproxy01", cpu: 2, memory_mb: 4096, disk_gb: 40, role: "haproxy" }
+  - { name: "haproxy02", cpu: 2, memory_mb: 4096, disk_gb: 40, role: "haproxy" }
+  - { name: "webserver01", cpu: 2, memory_mb: 4096, disk_gb: 40, role: "webserver" }
+  - { name: "webserver02", cpu: 2, memory_mb: 4096, disk_gb: 40, role: "webserver" }
+  - { name: "database01", cpu: 4, memory_mb: 8192, disk_gb: 100, role: "database" }
+
+mysql_root_password: "securepassword"  # Change this and store securely
+mysql_database: "webappdb"
+mysql_user: "webappuser"
+mysql_password: "userpassword"  # Change this and store securely

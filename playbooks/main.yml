@@ -29,10 +29,13 @@
           include_tasks: tasks/provision_vms.yml
         - name: Include HAProxy configuration tasks
           include_tasks: tasks/configure_haproxy.yml
+          become: yes
         - name: Include Web Server configuration tasks
           include_tasks: tasks/configure_webservers.yml
+          become: yes
         - name: Include Database configuration tasks
           include_tasks: tasks/configure_database.yml
+          become: yes
         - name: Display server information
           include_tasks: tasks/display_info.yml
         - name: Debug - Completed deployment block

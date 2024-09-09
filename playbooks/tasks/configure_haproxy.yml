@@ -1,0 +1,27 @@
+---
+- name: Configure HAProxy Load Balancers
+  hosts: haproxy
+  become: yes
+  tasks:
+    - name: Install HAProxy
+      yum:
+        name: haproxy
+        state: present
+
+    - name: Configure HAProxy
+      template:
+        src: templates/haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+      notify: Restart HAProxy
+
+    - name: Enable and start HAProxy
+      systemd:
+        name: haproxy
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart HAProxy
+      systemd:
+        name: haproxy
+        state: restarted

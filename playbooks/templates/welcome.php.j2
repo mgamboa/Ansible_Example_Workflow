@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Server <?php echo gethostname(); ?></title>
+</head>
+<body>
+    <h1>Welcome to Server <?php echo gethostname(); ?></h1>
+    <p>This is web server number <?php echo substr(gethostname(), -2); ?>.</p>
+    <p>Current time: <?php echo date('Y-m-d H:i:s'); ?></p>
+    <p><a href="db_test.php">Test Database Connection</a></p>
+</body>
+</html>

@@ -1,0 +1,12 @@
+---
+- name: Display HAProxy IP addresses
+  debug:
+    msg: "HAProxy servers are available at: {{ groups['haproxy'] | map('extract', hostvars, ['ansible_host']) | join(', ') }}"
+
+- name: Display Web Server IP addresses
+  debug:
+    msg: "Web servers are available at: {{ groups['webserver'] | map('extract', hostvars, ['ansible_host']) | join(', ') }}"
+
+- name: Display Database IP address
+  debug:
+    msg: "Database server is available at: {{ groups['database'] | map('extract', hostvars, ['ansible_host']) | join(', ') }}"

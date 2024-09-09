@@ -1,0 +1,42 @@
+---
+- name: Create VMs from template
+  community.vmware.vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    name: "{{ item.name }}"
+    template: "{{ template_name }}"
+    datacenter: "{{ datacenter_name }}"
+    folder: "{{ vm_folder }}"
+    cluster: "{{ cluster_name }}"
+    networks:
+      - name: "{{ vm_network_name }}"
+    hardware:
+      num_cpus: "{{ item.cpu }}"
+      memory_mb: "{{ item.memory_mb }}"
+    disk:
+      - size_gb: "{{ item.disk_gb }}"
+        type: thin
+        datastore: "{{ datastore_name }}"
+    customization:
+      domain: "{{ domain_name }}"
+    state: poweredon
+    wait_for_ip_address: yes
+  loop: "{{ vm_specs }}"
+  register: deployed_vms
+
+- name: Add VMs to in-memory inventory
+  add_host:
+    hostname: "{{ item.instance.hw_name }}"
+    ansible_host: "{{ item.instance.ipv4 }}"
+    groups: "{{ item.item.role }}"
+  loop: "{{ deployed_vms.results }}"
+
+- name: Wait for SSH to come up on all VMs
+  wait_for:
+    host: "{{ item.instance.ipv4 }}"
+    port: 22
+    delay: 10
+    timeout: 300
+  loop: "{{ deployed_vms.results }}"

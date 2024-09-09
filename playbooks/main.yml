@@ -23,3 +23,4 @@
     
     - name: Destroy Deployment 
       include_tasks: tasks/destroy.yml
+      when: destroy_deployment | default(false) | bool

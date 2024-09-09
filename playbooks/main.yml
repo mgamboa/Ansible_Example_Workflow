@@ -8,15 +8,20 @@
   tasks:
     - name: Include VM provisioning tasks
       include_tasks: tasks/provision_vms.yml
+      when: execute_provision | default(false)
 
     - name: Include HAProxy configuration tasks
       include_tasks: tasks/configure_haproxy.yml
+      when: execute_haproxy | default(false)
 
     - name: Include Web Server configuration tasks
       include_tasks: tasks/configure_webservers.yml
+      when: execute_webservers | default(false)
 
     - name: Include Database configuration tasks
       include_tasks: tasks/configure_database.yml
+      when: execute_database | default(false)
 
     - name: Display server information
       include_tasks: tasks/display_info.yml
+      when: execute_provision | default(false)

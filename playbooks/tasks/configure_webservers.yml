@@ -1,7 +1,5 @@
 ---
 - name: Configure Web Servers
-  hosts: webserver
-  become: yes
   tasks:
     - name: Install Apache and PHP
       yum:

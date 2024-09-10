@@ -1,27 +1,56 @@
 ---
-- name: Deploy Load Balanced Web Application in VMware
+- name: Deploy or Destroy Load Balanced Web Application in VMware
   hosts: localhost
   connection: local
   gather_facts: false
   vars_files:
     - ../group_vars/all.yml
   tasks:
-    - name: Include VM provisioning tasks
-      include_tasks: tasks/provision_vms.yml
-      when: execute_provision | default(false)
+    - name: Debug variables
+      debug:
+        msg: 
+          - "destroy_deployment: {{ destroy_deployment | default(false) }}"
+          - "All variables: {{ vars | to_nice_yaml }}"
 
-    - name: Include HAProxy configuration tasks
-      include_tasks: tasks/configure_haproxy.yml
-      when: execute_haproxy | default(false)
+    - name: Run deployment tasks
+      block:
+        - name: Include VM provisioning tasks
+          include_tasks: tasks/provision_vms.yml
 
-    - name: Include Web Server configuration tasks
-      include_tasks: tasks/configure_webservers.yml
-      when: execute_webservers | default(false)
+        - name: Include HAProxy configuration tasks
+          include_tasks: tasks/configure_haproxy.yml
+          become: yes
+          vars:
+            ansible_become_user: root
+          delegate_to: "{{ item }}"
+          loop: "{{ groups['haproxy'] }}"
 
-    - name: Include Database configuration tasks
-      include_tasks: tasks/configure_database.yml
-      when: execute_database | default(false)
+        - name: Include Web Server configuration tasks
+          include_tasks: tasks/configure_webservers.yml
+          become: yes
+          vars:
+            ansible_become_user: root
+          delegate_to: "{{ item }}"
+          loop: "{{ groups['webserver'] }}"
 
-    - name: Display server information
-      include_tasks: tasks/display_info.yml
-      when: execute_provision | default(false)
+        - name: Include Database configuration tasks
+          include_tasks: tasks/configure_database.yml
+          become: yes
+          vars:
+            ansible_become_user: root
+          delegate_to: "{{ item }}"
+          loop: "{{ groups['database'] }}"
+
+        - name: Display server information
+          include_tasks: tasks/display_info.yml
+      when: not (destroy_deployment | default(false) | bool)
+
+    - name: Destroy Deployment
+      block:
+        - name: Include destroy tasks
+          include_tasks: tasks/destroy.yml
+      when: destroy_deployment | default(false) | bool
+
+    - name: Final debug
+      debug:
+        msg: "Playbook execution completed"

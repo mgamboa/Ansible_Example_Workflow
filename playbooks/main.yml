@@ -7,45 +7,54 @@
     - ../group_vars/all.yml
   tasks:
     - name: Debug variables
-      debug:
+      ansible.builtin.debug:
         msg: 
           - "destroy_deployment: {{ destroy_deployment | default(false) }}"
           - "All variables: {{ vars | to_nice_yaml }}"
 
     - name: Run deployment tasks
+      when: not (destroy_deployment | default(false) | bool)
       block:
         - name: Include VM provisioning tasks
-          include_tasks: tasks/provision_vms.yml
+          ansible.builtin.include_tasks:
+            file: tasks/provision_vms.yml
 
         - name: Configure HAProxy
-          include_tasks: tasks/configure_haproxy.yml
+          ansible.builtin.include_tasks:
+            file: tasks/configure_haproxy.yml
+            apply:
+              become: yes
+          loop: "{{ groups['haproxy'] }}"
           vars:
             ansible_host: "{{ item }}"
-          loop: "{{ groups['haproxy'] }}"
-          become: yes
 
         - name: Include Web Server configuration tasks
-          include_tasks: tasks/configure_webservers.yml
+          ansible.builtin.include_tasks:
+            file: tasks/configure_webservers.yml
+            apply:
+              become: yes
+          loop: "{{ groups['webserver'] }}"
           vars:
             ansible_host: "{{ item }}"
-          loop: "{{ groups['haproxy'] }}"
-          become: yes
 
         - name: Include Database configuration tasks
-          include_tasks: tasks/configure_database.yml
+          ansible.builtin.include_tasks:
+            file: tasks/configure_database.yml
+            apply:
+              become: yes
+          loop: "{{ groups['database'] }}"
           vars:
             ansible_host: "{{ item }}"
-          loop: "{{ groups['haproxy'] }}"
-          become: yes
 
         - name: Display server information
-          include_tasks: tasks/display_info.yml
-      when: not (destroy_deployment | default(false) | bool)
+          ansible.builtin.include_tasks:
+            file: tasks/display_info.yml
 
     - name: Run destruction tasks
-      include_tasks: tasks/destroy.yml
+      ansible.builtin.include_tasks:
+        file: tasks/destroy.yml
       when: destroy_deployment | default(false) | bool
 
     - name: Final debug
-      debug:
+      ansible.builtin.debug:
         msg: "Playbook execution completed"

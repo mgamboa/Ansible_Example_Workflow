@@ -16,16 +16,7 @@
     state: started
     enabled: yes
 
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
-
 - name: Ensure HAProxy is running
   ansible.builtin.systemd:
     name: haproxy
     state: started
-
-handlers:
-  - name: Restart HAProxy
-    ansible.builtin.systemd:
-      name: haproxy
-      state: restarted

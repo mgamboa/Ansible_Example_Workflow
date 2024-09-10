@@ -1,48 +1,21 @@
----
-- name: Deploy or Destroy Load Balanced Web Application in VMware
+- name: Deploy Load Balanced Web Application in VMware
   hosts: localhost
   connection: local
   gather_facts: false
   vars_files:
     - ../group_vars/all.yml
   tasks:
-    - name: Debug variables
-      debug:
-        msg: 
-          - "destroy_deployment: {{ destroy_deployment | default(false) }}"
-          - "All variables: {{ vars | to_nice_yaml }}"
+    - name: Include VM provisioning tasks
+      include_tasks: tasks/provision_vms.yml
 
-    - name: Run deployment tasks
-      block:
-        - name: Include VM provisioning tasks
-          include_tasks: tasks/provision_vms.yml
+    - name: Include HAProxy configuration tasks
+      include_tasks: tasks/configure_haproxy.yml
 
-        - name: Configure HAProxy
-          include_tasks: tasks/configure_haproxy.yml
-          vars:
-            target_host: "{{ item }}"
-          loop: "{{ groups['haproxy'] }}"
+    - name: Include Web Server configuration tasks
+      include_tasks: tasks/configure_webservers.yml
 
-        - name: Configure Web Servers
-          include_tasks: tasks/configure_webservers.yml
-          vars:
-            target_host: "{{ item }}"
-          loop: "{{ groups['webserver'] }}"
+    - name: Include Database configuration tasks
+      include_tasks: tasks/configure_database.yml
 
-        - name: Configure Database
-          include_tasks: tasks/configure_database.yml
-          vars:
-            target_host: "{{ item }}"
-          loop: "{{ groups['database'] }}"
-
-        - name: Display server information
-          include_tasks: tasks/display_info.yml
-      when: not (destroy_deployment | default(false) | bool)
-
-    - name: Destroy Deployment
-      include_tasks: tasks/destroy.yml
-      when: destroy_deployment | default(false) | bool
-
-    - name: Final debug
-      debug:
-        msg: "Playbook execution completed"
+    - name: Display server information
+      include_tasks: tasks/display_info.ym

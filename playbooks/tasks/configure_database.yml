@@ -1,49 +1,45 @@
 ---
-- name: Configure Database Server
-  hosts: database
-  become: yes
-  tasks:
-    - name: Install MariaDB
-      yum:
-        name: 
-          - mariadb-server
-          - python3-PyMySQL
-        state: present
+- name: Install MariaDB
+  yum:
+    name: 
+      - mariadb-server
+      - python3-PyMySQL
+    state: present
 
-    - name: Start and enable MariaDB
-      systemd:
-        name: mariadb
-        state: started
-        enabled: yes
+- name: Start and enable MariaDB
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
 
-    - name: Set MariaDB root password
-      mysql_user:
-        name: root
-        password: "{{ mysql_root_password }}"
-        login_unix_socket: /var/lib/mysql/mysql.sock
+- name: Set MariaDB root password
+  mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
 
-    - name: Create database
-      mysql_db:
-        name: "{{ mysql_database }}"
-        state: present
-        login_unix_socket: /var/lib/mysql/mysql.sock
+- name: Create database
+  mysql_db:
+    name: "{{ mysql_database }}"
+    state: present
+    login_unix_socket: /var/lib/mysql/mysql.sock
 
-    - name: Create database user
-      mysql_user:
-        name: "{{ mysql_user }}"
-        password: "{{ mysql_password }}"
-        priv: "{{ mysql_database }}.*:ALL"
-        host: '%'
-        state: present
-        login_unix_socket: /var/lib/mysql/mysql.sock
+- name: Create database user
+  mysql_user:
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_password }}"
+    priv: "{{ mysql_database }}.*:ALL"
+    host: '%'
+    state: present
+    login_unix_socket: /var/lib/mysql/mysql.sock
 
-    - name: Create sample table
-      mysql_query:
-        login_db: "{{ mysql_database }}"
-        query: |
-          CREATE TABLE IF NOT EXISTS messages (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            message TEXT NOT NULL
-          );
-          INSERT INTO messages (message) VALUES ('Hello from the database!');
-        login_unix_socket: /var/lib/mysql/mysql.sock
+- name: Create sample table
+  mysql_query:
+    login_db: "{{ mysql_database }}"
+    query: |
+      CREATE TABLE IF NOT EXISTS messages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        message TEXT NOT NULL
+      );
+      INSERT INTO messages (message) VALUES ('Hello from the database!');
+    login_unix_socket: /var/lib/mysql/mysql.sock

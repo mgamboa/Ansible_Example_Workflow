@@ -20,14 +20,26 @@
         - name: Include HAProxy configuration tasks
           include_tasks: tasks/configure_haproxy.yml
           become: yes
+          vars:
+            ansible_become_user: root
+          delegate_to: "{{ item }}"
+          loop: "{{ groups['haproxy'] }}"
 
         - name: Include Web Server configuration tasks
           include_tasks: tasks/configure_webservers.yml
           become: yes
+          vars:
+            ansible_become_user: root
+          delegate_to: "{{ item }}"
+          loop: "{{ groups['webserver'] }}"
 
         - name: Include Database configuration tasks
           include_tasks: tasks/configure_database.yml
           become: yes
+          vars:
+            ansible_become_user: root
+          delegate_to: "{{ item }}"
+          loop: "{{ groups['database'] }}"
 
         - name: Display server information
           include_tasks: tasks/display_info.yml

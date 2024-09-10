@@ -18,27 +18,21 @@
           include_tasks: tasks/provision_vms.yml
 
         - name: Configure HAProxy
-          block:
-            - name: Include HAProxy configuration tasks
-              include_tasks: tasks/configure_haproxy.yml
-          become: yes
-          delegate_to: "{{ item }}"
+          include_tasks: tasks/configure_haproxy.yml
+          vars:
+            target_host: "{{ item }}"
           loop: "{{ groups['haproxy'] }}"
 
         - name: Configure Web Servers
-          block:
-            - name: Include Web Server configuration tasks
-              include_tasks: tasks/configure_webservers.yml
-          become: yes
-          delegate_to: "{{ item }}"
+          include_tasks: tasks/configure_webservers.yml
+          vars:
+            target_host: "{{ item }}"
           loop: "{{ groups['webserver'] }}"
 
         - name: Configure Database
-          block:
-            - name: Include Database configuration tasks
-              include_tasks: tasks/configure_database.yml
-          become: yes
-          delegate_to: "{{ item }}"
+          include_tasks: tasks/configure_database.yml
+          vars:
+            target_host: "{{ item }}"
           loop: "{{ groups['database'] }}"
 
         - name: Display server information
@@ -46,9 +40,7 @@
       when: not (destroy_deployment | default(false) | bool)
 
     - name: Destroy Deployment
-      block:
-        - name: Include destroy tasks
-          include_tasks: tasks/destroy.yml
+      include_tasks: tasks/destroy.yml
       when: destroy_deployment | default(false) | bool
 
     - name: Final debug

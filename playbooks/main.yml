@@ -17,14 +17,26 @@
         - name: Include VM provisioning tasks
           include_tasks: tasks/provision_vms.yml
 
-        - name: Include HAProxy configuration tasks
+        - name: Configure HAProxy
           include_tasks: tasks/configure_haproxy.yml
+          vars:
+            ansible_host: "{{ item }}"
+          loop: "{{ groups['haproxy'] }}"
+          become: yes
 
         - name: Include Web Server configuration tasks
           include_tasks: tasks/configure_webservers.yml
+          vars:
+            ansible_host: "{{ item }}"
+          loop: "{{ groups['haproxy'] }}"
+          become: yes
 
         - name: Include Database configuration tasks
           include_tasks: tasks/configure_database.yml
+          vars:
+            ansible_host: "{{ item }}"
+          loop: "{{ groups['haproxy'] }}"
+          become: yes
 
         - name: Display server information
           include_tasks: tasks/display_info.yml

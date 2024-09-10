@@ -1,6 +1,5 @@
 ---
 - name: Configure HAProxy Load Balancers
-  hosts: haproxy
   become: yes
   tasks:
     - name: Install HAProxy

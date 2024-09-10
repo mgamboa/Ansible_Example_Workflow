@@ -1,6 +1,6 @@
 ---
 - name: Install HAProxy
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: haproxy
     state: present
 

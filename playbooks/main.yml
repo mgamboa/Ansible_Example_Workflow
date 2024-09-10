@@ -1,5 +1,9 @@
 ---
-vars_files:
+- name: Deploy or Destroy Load Balanced Web Application in VMware
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
     - ../group_vars/all.yml
   tasks:
     - name: Debug variables
@@ -33,6 +37,3 @@ vars_files:
     - name: Final debug
       debug:
         msg: "Playbook execution completed"
-Last edited just now
-
-

@@ -24,27 +24,24 @@
             file: tasks/configure_haproxy.yml
             apply:
               become: yes
+              delegate_to: "{{ item }}"
           loop: "{{ groups['haproxy'] }}"
-          vars:
-            ansible_host: "{{ item }}"
 
         - name: Include Web Server configuration tasks
           ansible.builtin.include_tasks:
             file: tasks/configure_webservers.yml
             apply:
               become: yes
+              delegate_to: "{{ item }}"
           loop: "{{ groups['webserver'] }}"
-          vars:
-            ansible_host: "{{ item }}"
 
         - name: Include Database configuration tasks
           ansible.builtin.include_tasks:
             file: tasks/configure_database.yml
             apply:
               become: yes
+              delegate_to: "{{ item }}"
           loop: "{{ groups['database'] }}"
-          vars:
-            ansible_host: "{{ item }}"
 
         - name: Display server information
           ansible.builtin.include_tasks:
